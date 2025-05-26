@@ -1,0 +1,46 @@
+package com.example.test;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import io.github.bonigarcia.wdm.WebDriverManager;
+
+public class NestedFramesTest {
+    public static void main(String[] args) {
+
+        WebDriverManager.chromedriver().setup(); // Auto-manage ChromeDriver
+        WebDriver driver = new ChromeDriver();
+
+        try {
+            driver.get("http://the-internet.herokuapp.com/nested_frames");
+
+            driver.switchTo().frame("frame-top");
+
+            int frameCount = driver.findElements(By.xpath("//frame")).size();
+            System.out.println(frameCount == 3 ? "Top frame has 3 frames." : "Top frame count mismatch.");
+
+            driver.switchTo().frame("frame-left");
+            System.out.println(driver.findElement(By.tagName("body")).getText().equals("LEFT") ? "LEFT frame verified." : "LEFT frame mismatch.");
+            driver.switchTo().parentFrame();
+
+            driver.switchTo().frame("frame-middle");
+            System.out.println(driver.findElement(By.id("content")).getText().equals("MIDDLE") ? "MIDDLE frame verified." : "MIDDLE frame mismatch.");
+            driver.switchTo().parentFrame();
+
+            driver.switchTo().frame("frame-right");
+            System.out.println(driver.findElement(By.tagName("body")).getText().equals("RIGHT") ? "RIGHT frame verified." : "RIGHT frame mismatch.");
+
+            driver.switchTo().defaultContent();
+            driver.switchTo().frame("frame-bottom");
+            System.out.println(driver.findElement(By.tagName("body")).getText().equals("BOTTOM") ? "BOTTOM frame verified." : "BOTTOM frame mismatch.");
+
+            driver.switchTo().defaultContent();
+            driver.navigate().to("http://the-internet.herokuapp.com/frames");
+            System.out.println(driver.getTitle().equals("The Internet") ? "Title verified as 'The Internet'." : "Title mismatch.");
+
+        } finally {
+            driver.quit();
+        }
+    }
+}
