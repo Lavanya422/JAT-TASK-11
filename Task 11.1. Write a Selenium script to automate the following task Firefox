@@ -1,0 +1,63 @@
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import java.util.Set;
+
+public class WindowHandlingTest {
+    public static void main(String[] args) {
+        // Set the path to your ChromeDriver executable
+        System.setProperty("webdriver.chrome.driver", "C:\\Software\\chromedriver-win64\\chromedriver.exe");
+
+        // Initialize the ChromeDriver
+        WebDriver driver = new ChromeDriver();
+
+        try {
+            // Navigate to the URL
+            driver.get("https://the-internet.herokuapp.com/windows");
+
+            // Store the original window handle
+            String originalWindow = driver.getWindowHandle();
+
+            // Click the "Click Here" link to open a new window
+            WebElement clickHere = driver.findElement(By.linkText("Click Here"));
+            clickHere.click();
+
+            // Wait briefly to ensure the new window is opened
+            Thread.sleep(2000);
+
+            // Switch to the new window
+            Set<String> allWindows = driver.getWindowHandles();
+            for (String windowHandle : allWindows) {
+                if (!windowHandle.equals(originalWindow)) {
+                    driver.switchTo().window(windowHandle);
+                    break;
+                }
+            }
+
+            // Verify the text "New Window" is present
+            WebElement heading = driver.findElement(By.tagName("h3"));
+            if (heading.getText().equals("New Window")) {
+                System.out.println("New window text verification passed.");
+            } else {
+                System.out.println("New window text verification failed.");
+            }
+
+            // Close the new window
+            driver.close();
+
+            // Switch back to the original window
+            driver.switchTo().window(originalWindow);
+
+            // Verify the original window is active (just print the title)
+            System.out.println("Switched back to original window: " + driver.getTitle());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // Close the browser
+            driver.quit();
+        }
+    }
+}
